@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+
+{% block wrapper %}
+<section id="main-content">
+	<section class="wrapper">
+		<div class="table-agile-info">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+         Basic table
+        </div>
+             <div>
+
+
+         <div id="toolbar">
+            <div class="form-inline" role="form">
+                <div class="form-group">
+                    <span>Offset: </span>
+                    <input name="offset" class="form-control w70" type="number" value="0">
+                </div>
+                <div class="form-group">
+                    <span>Limit: </span>
+                    <input name="limit" class="form-control w70" type="number" value="5">
+                </div>
+                <div class="form-group">
+                    <span>Search: </span>
+                    <input name="search" class="form-control" type="text" placeholder="Search">
+                </div>
+                <button id="ok" type="submit" class="btn btn-default">OK</button>
+                <button id="remove" class="btn btn-danger" disabled>删除</button>
+                <button class="btn btn-default" onclick="location.href='/product_create'">创建</button>
+            </div>
+        </div>
+        <table id="table "
+               data-toggle="table"
+               data-height="460"
+               data-toolbar="#toolbar"
+               data-show-refresh="true"
+               data-show-toggle="true"
+               data-show-columns="true"
+               data-query-params="queryParams"
+               data-response-handler="responseHandler"
+               data-pagination="true"
+               data-pagination-info="false"
+               data-page-size="2"
+               data-pagination-first-text="首页"
+               data-pagination-last-text="末尾"
+                data-url="/product_data">
+            <thead>
+            <tr>
+                <th data-checkbox="true"></th>
+                <th data-field="id">序号</th>
+                <th data-field="name">名称</th>
+                <th data-field="price">单价</th>
+                <th data-field="cost">成本</th>
+                <th data-field="code">条码</th>
+                <th data-field="mod_date">更新日期</th>
+                <th data-events="operateEvents" data-formatter="AddFunctionAlty">操作</th>
+            </tr>
+            </thead>
+        </table>
+
+        </div>
+
+            </div>
+        </div>
+
+    </section>
+<script>
+    var $table = $('#table'),
+        $remove = $('#remove');
+        $ok = $('#ok');
+
+    $(function () {
+        $ok.click(function () {
+            $table.bootstrapTable('refresh');
+        });
+        $table.on('check.bs.table uncheck.bs.table check-all.bs.table uncheck-all.bs.table', function () {
+            $remove.prop('disabled', !$table.bootstrapTable('getSelections').length);
+        });
+        $remove.click(function () {
+            var ids = $.map($table.bootstrapTable('getSelections'), function (row) {
+                return row.id
+            });
+
+            $table.bootstrapTable('remove', {
+                field: 'id',
+                values: ids
+            });
+
+            console.log(ids)
+            $remove.prop('disabled', true);
+        });
+    });
+    function AddFunctionAlty(value,row,index){
+        return "<button type='button'  class='btn btn-default edit' >编辑"
+    }
+    var operateEvents = {
+        'click .delete':function(e, value, row, index){
+
+             $table.bootstrapTable('remove', {
+                field: 'id',
+                values: [row.id]
+            });
+
+        },
+        'click .edit':function(e, value, row, index){
+            window.open("/xxxxx?id="+row.id,"_blank");
+        }
+    }
+    function queryParams() {
+        var params = {};
+        $('#toolbar').find('input[name]').each(function () {
+            params[$(this).attr('name')] = $(this).val();
+        });
+        return params;
+    }
+
+    function responseHandler(res) {
+        return res.rows;
+    }
+</script>
+</section>
+{% endblock %}
